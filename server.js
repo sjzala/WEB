@@ -14,15 +14,24 @@
 const express = require('express');
 const path = require('path');
 const legoData = require('./modules/legoSets');
+const helmet = require('helmet');
+const morgan = require('morgan');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Set the view engine to EJS
 app.set('view engine', 'ejs');
 
+// Security middleware
+app.use(helmet());
+
+// Logging middleware
+app.use(morgan('dev'));
+
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.urlencoded({ extended: true })); // Middleware to handle URL-encoded form data
+app.use(express.json()); // Middleware to handle JSON-formatted request bodies
 
 // Initialize the lego data
 legoData.initialize().then(() => {
@@ -116,6 +125,12 @@ legoData.initialize().then(() => {
     // Custom 404 error page
     app.use((req, res) => {
         res.status(404).render('404', { message: "I'm sorry we're unable to find what you're looking for", page: '' });
+    });
+
+    // General error handling middleware
+    app.use((err, req, res, next) => {
+        console.error(err.stack);
+        res.status(500).render('500', { message: "Something went wrong!" });
     });
 
     // Start the server
