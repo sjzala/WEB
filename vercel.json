@@ -13,11 +13,6 @@
     ],
     "routes": [
         {
-            "src": "/css/(.*)",
-            "dest":"public/css/$1"
-        },
-        
-        {
             "src": "/(.*)",
             "dest": "server.js"
         }
